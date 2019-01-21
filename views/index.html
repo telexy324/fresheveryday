@@ -1,0 +1,84 @@
+
+
+	<div class="navbar_con">
+		<div class="navbar">
+			<h1 class="fl">全部商品分类</h1>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="center_con clearfix">
+		<ul class="subnav fl">
+		{{range .goodsTypes}}
+			<li><a href="/goodsList?id={{.Id}}" class="{{.Logo}}">{{.Name}}</a></li>
+		{{end}}
+		</ul>
+		<div class="slide fl">
+			<ul class="slide_pics">
+			{{range .indexGoodsBanners}}
+				<li><img src="{{$.fdfshost}}{{.Image}}" alt="幻灯片"></li>
+			{{end}}
+			</ul>
+			<div class="prev"></div>
+			<div class="next"></div>
+			<ul class="points"></ul>
+		</div>
+		<div class="adv fl">
+		{{range .indexPromotionBanners}}
+			<a href="#"><img src="{{$.fdfshost}}{{.Image}}"></a>
+		{{end}}
+		</div>
+	</div>
+
+	{{range .goodsSKUs}}
+	<div class="list_model">
+		<div class="list_title clearfix">
+			<h3 class="fl" id="model01">{{.type.Name}}</h3>
+			<div class="subtitle fl">
+				<span>|</span>
+				{{range .goodsText}}
+				<a href="/goodsDetails?id={{.GoodsSKU.Id}}">{{.GoodsSKU.Name}}</a>
+				{{end}}
+			</div>
+			<a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+		</div>
+
+		<div class="goods_con clearfix">
+			<div class="goods_banner fl"><img src="{{$.fdfshost}}{{.type.Image}}"></div>
+			<ul class="goods_list fl">
+				{{range .goodsImage}}
+				<li>
+					<h4><a href="/goodsDetails?id={{.GoodsSKU.Id}}">{{.GoodsSKU.Name}}</a></h4>
+					<a href="/goodsDetails?id={{.GoodsSKU.Id}}"><img src="{{$.fdfshost}}{{.GoodsSKU.Image}}"></a>
+					<div class="prize">¥ {{.GoodsSKU.Price}}</div>
+				</li>
+				{{end}}
+			</ul>
+		</div>
+	</div>
+	{{end}}
+
+
+	<script type="text/javascript" src="/static/js/slideshow.js"></script>
+	<script type="text/javascript">
+		BCSlideshow('focuspic');
+		var oFruit = document.getElementById('fruit_more');
+		var oShownum = document.getElementById('show_count');
+
+		var hasorder = localStorage.getItem('order_finish');
+
+		if(hasorder)
+		{
+			oShownum.innerHTML = '2';
+		}
+
+		oFruit.onclick = function(){
+			window.location.href = 'list.html';
+		}
+	</script>

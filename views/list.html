@@ -1,0 +1,98 @@
+
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+				{{range .goodsTypes}}
+                    <li><a href="/goodsList?id={{.Id}}" class="{{.Logo}}">{{.Name}}</a></li>
+				{{end}}
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="#">新鲜水果</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{{range .newGoods}}
+					<li>
+                        <a href="/goodsDetails?id={{.Id}}"><img src="{{$.fdfshost}}{{.Image}}"></a>
+						<h4><a href="#">{{.Name}}</a></h4>
+						<div class="prize">￥{{.Price}}</div>
+					</li>
+					{{end}}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+                <a href="/goodsList?id={{.id}}" {{if compare .sort ""}}class="active"{{end}}>默认</a>
+                <a href="/goodsList?id={{.id}}&sort=price" {{if compare .sort "price"}}class="active"{{end}}>价格</a>
+                <a href="/goodsList?id={{.id}}&sort=sale" {{if compare .sort "sale"}}class="active"{{end}}>人气</a>
+			</div>
+
+			<ul class="goods_type_list clearfix">
+				{{range .goodsSKU}}
+				<li>
+					<a href="/goodsDetails?id={{.Id}}"><img src="{{$.fdfshost}}{{.Image}}"></a>
+					<h4><a href="detail.html">{{.Name}}</a></h4>
+					<div class="operate">
+						<span class="prize">￥{{.Price}}</span>
+						<span class="unit">{{.Unite}}</span>
+						<a href="#" class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+				{{end}}
+
+			</ul>
+
+			<div class="pagenation">
+				<a href="/goodsList?pageIndex={{.pageIndex | ShowPrePage}}&id={{.id}}&sort={{.sort}}">&lt;上一页</a>
+				{{range $index ,$val := .pageDisplay}}
+					{{/*{{if compare $.pageIndex $val}}*/}}
+                    	{{/*<a href="/goodsList?pageIndex={{$val}}&id={{$.id}}&sort={{$.sort}}" class="active">{{$val}}</a>*/}}
+					{{/*{{else}}*/}}
+                        {{/*<a href="/goodsList?pageIndex={{$val}}&id={{$.id}}&sort={{$.sort}}">{{$val}}</a>*/}}
+					{{/*{{end}}*/}}
+					<a href="/goodsList?pageIndex={{$val}}&id={{$.id}}&sort={{$.sort}}" {{if compare $.pageIndex $val}} class="active" {{end}}>{{$val}}</a>
+				{{end}}
+				<a href="/goodsList?pageIndex={{NextPage .pageIndex .pages}}&id={{.id}}&sort={{.sort}}">下一页&gt;</a>
+			</div>
+		</div>
+	</div>
+
+{{/*<script src="/static/js/jquery-1.12.2.js"></script>*/}}
+{{/*<script type="text/javascript">*/}}
+	{{/*$(function () {*/}}
+	    {{/*for (i={{.pages}};i>0;i--) {*/}}
+            {{/*var $pageHtml*/}}
+            {{/*if (i == {{.pageIndex}}) {*/}}
+                {{/*$pageHtml = $('<a href="/goodsList?pageIndex='+i+'&id={{.id}}&sort={{.sort}}" class="active">'+i+'</a>');*/}}
+			{{/*} else {*/}}
+                {{/*$pageHtml = $('<a href="/goodsList?pageIndex='+i+'&id={{.id}}&sort={{.sort}}">'+i+'</a>');*/}}
+			{{/*}*/}}
+
+            {{/*$pageHtml.insertAfter($('.pagenation a').eq(0))*/}}
+		{{/*}*/}}
+
+    {{/*})*/}}
+</script>

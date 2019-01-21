@@ -1,0 +1,227 @@
+
+
+	<div class="total_count">全部商品<em>0</em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+    <form method="post" action="confirmOrder">
+	{{range .goods}}
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" name="id" value="{{.goodsSKU.Id}}"checked></li>
+		<li class="col02"><img src="{{$.fdfshost}}{{.goodsSKU.Image}}"></li>
+		<li class="col03">{{.goodsSKU.Name}}<br><em>{{.goodsSKU.Price}}元/{{.goodsSKU.Unite}}</em></li>
+		<li class="col04">{{.goodsSKU.Unite}}</li>
+		<li class="col05">{{.goodsSKU.Price}}元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" goodsId="{{.goodsSKU.Id}}" value="{{.count}}">
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">{{.perPrice}}元</li>
+		{{/*<li class="col08"><a goodsId="{{.goodsSKU.Id}}" href="/user/delCart?goodsId={{.goodsSKU.Id}}">删除</a></li>*/}}
+        <li class="col08"><a goodsId="{{.goodsSKU.Id}}" href="javascript:;">删除</a></li>
+	</ul>
+	{{end}}
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>00.00</em><br>共计<b>0</b>件商品</li>
+		{{/*<li class="col04"><a href="place_order.html">去结算</a></li>*/}}
+        <input class="col04" type="submit" value="去结算">
+	</ul>
+    </form>
+
+    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+        getTotalPrice();
+
+		function getTotalPrice() {
+		    var $totalCatgories = 0
+			var $totalPrice = 0
+			$('.cart_list_td').find(':checked').parents('ul').each(function () {
+				$totalCatgories = $totalCatgories + parseInt($(this).find('.num_show').val())
+				$totalPrice = $totalPrice + parseFloat($(this).children('.col07').html())
+            })
+			$('.settlements .col03 em').html($totalPrice)
+            $('.settlements .col03 b').html($totalCatgories)
+            $('.total_count em').html($totalCatgories)
+        }
+
+        $('.cart_list_td').find(':checkbox').change(function () {
+            var $totalBox = $('.cart_list_td').find(':checkbox').length
+			var $totalChecked = $('.cart_list_td').find(':checked').length
+			if ($totalBox > $totalChecked) {
+                $('.settlements .col01 :checkbox').prop('checked',"")
+			} else {
+                $('.settlements .col01 :checkbox').prop('checked',"checked")
+			}
+            getTotalPrice();
+        })
+
+        $('.settlements .col01 :checkbox').change(function () {
+            var $totalBox = $('.cart_list_td').find(':checkbox').length
+            var $totalChecked = $('.cart_list_td').find(':checked').length
+            if ($totalBox > $totalChecked) {
+                $('.cart_list_td').find(':checkbox').prop('checked',"checked")
+            } else {
+                $('.cart_list_td').find(':checkbox').prop('checked',"")
+            }
+            getTotalPrice();
+        })
+
+		$('.cart_list_td').find('.add').click(function () {
+            var $preCount = parseInt($(this).next().val())
+            var $isErrUpdate = true
+
+		    var $data = {'goodsId':$(this).next().attr('goodsId'),'count':1}
+            $.ajaxSettings.async = false
+			$.ajax({
+				url:'/user/addCart',
+				method:'post',
+				data:$data,
+				dataType:'json',
+				success:function (dat) {
+					if (dat.code == 5) {
+                        $isErrUpdate = false
+					} else {
+                        $isErrUpdate = true
+					}
+                },
+				error:function () {
+					alert('服务器出错')
+                }
+			})
+
+            $.ajaxSettings.async = true
+
+			if (!$isErrUpdate) {
+                $(this).next().val($preCount+1)
+			    var $prePrice = parseFloat($(this).parents('.cart_list_td').children('.col07').html())
+                var $unitPrice = parseFloat($(this).parents('.cart_list_td').children('.col05').html())
+                $prePrice = $prePrice + $unitPrice
+                $(this).parents('.cart_list_td').children('.col07').html($prePrice+'元')
+			} else {
+                $(this).next().val($preCount)
+			}
+			getTotalPrice()
+        })
+
+        $('.cart_list_td').find('.minus').click(function () {
+            var $preCount = parseInt($(this).prev().val())
+            var $isErrUpdate = true
+
+			if ($preCount >= 2) {
+                var $data = {'goodsId':$(this).prev().attr('goodsId'),'count':-1}
+                $.ajaxSettings.async = false
+                $.ajax({
+                    url:'/user/addCart',
+                    method:'post',
+                    data:$data,
+                    dataType:'json',
+                    success:function (dat) {
+                        if (dat.code == 5) {
+                            $isErrUpdate = false
+                        } else {
+                            $isErrUpdate = true
+                        }
+                    },
+                    error:function () {
+                        alert('服务器出错')
+                    }
+                })
+                $.ajaxSettings.async = true
+            }
+
+            if (!$isErrUpdate) {
+                $(this).prev().val($preCount-1)
+                var $prePrice = parseFloat($(this).parents('.cart_list_td').children('.col07').html())
+                var $unitPrice = parseFloat($(this).parents('.cart_list_td').children('.col05').html())
+                $prePrice = $prePrice - $unitPrice
+                $(this).parents('.cart_list_td').children('.col07').html($prePrice+'元')
+            } else {
+                $(this).prev().val($preCount)
+            }
+            getTotalPrice()
+        })
+
+        $('.num_show').focus(function () {
+            $preNum = parseInt($(this).val())
+        })
+
+        $('.num_show').blur(function () {
+            var $updatedNum = $(this).val()
+            if (isNaN($updatedNum) || parseInt($updatedNum) <1 || $updatedNum.trim().length==0) {
+                $(this).val($preNum)
+                return
+            }
+            var $isErrUpdate = true
+            var $needUpdateNum=$updatedNum-$preNum
+            var $data = {'goodsId':$(this).attr('goodsId'),'count':$needUpdateNum}
+            $.ajaxSettings.async = false
+            $.ajax({
+                url:'/user/addCart',
+                method:'post',
+                data:$data,
+                dataType:'json',
+                success:function (dat) {
+                    if (dat.code == 5) {
+                        $isErrUpdate = false
+                    } else {
+                        $isErrUpdate = true
+                    }
+                },
+                error:function () {
+                    alert('服务器出错')
+                }
+            })
+            $.ajaxSettings.async = true
+            if (!$isErrUpdate) {
+                var $unitPrice = parseFloat($(this).parents('.cart_list_td').children('.col05').html())
+                var $updatedPrice = $unitPrice*$updatedNum
+                $(this).parents('.cart_list_td').children('.col07').html($updatedPrice+'元')
+            } else {
+                $(this).val($preNum)
+            }
+            getTotalPrice()
+        })
+
+        // $('.cart_list_td .col08 a').click(function () {
+        //     if(confirm("确认删除该商品吗？")){
+        //         return true;
+        //     }
+        //     return false;
+        // })
+
+        $('.cart_list_td .col08 a').click(function () {
+            if(!confirm("确认删除该商品吗？")){
+                return;
+            }
+            var $item = $(this).parents('.cart_list_td')
+            var $goodsId = $(this).attr('goodsId')
+            var $data = {'goodsId':$goodsId}
+            $.ajax({
+                url:'/user/delCart',
+                method:'post',
+                data:$data,
+                dataType:'json',
+                success:function (dat) {
+                    if (dat.code == 5) {
+                        $item.remove()
+                        getTotalPrice()
+                    }
+                },
+                error:function () {
+                    alert('删除失败')
+                }
+            })
+        })
+
+	</script>
